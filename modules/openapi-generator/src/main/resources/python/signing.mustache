@@ -58,18 +58,21 @@ HASH_SHA512 = 'sha512'
 
 class HttpSigningConfiguration:
     """The configuration parameters for the HTTP signature security scheme.
+
     The HTTP signature security scheme is used to sign HTTP requests with a private key
     which is in possession of the API client.
-    An 'Authorization' header is calculated by creating a hash of select headers,
+
+    An ``Authorization`` header is calculated by creating a hash of select headers,
     and optionally the body of the HTTP request, then signing the hash value using
-    a private key. The 'Authorization' header is added to outbound HTTP requests.
+    a private key. The ``Authorization`` header is added to outbound HTTP requests.
 
     :param key_id: A string value specifying the identifier of the cryptographic key,
         when signing HTTP requests.
     :param signing_scheme: A string value specifying the signature scheme, when
         signing HTTP requests.
-        Supported value are hs2019, rsa-sha256, rsa-sha512.
-        Avoid using rsa-sha256, rsa-sha512 as they are deprecated. These values are
+        Supported value are ``hs2019``, ``rsa-sha256``, ``rsa-sha512``.
+
+        Avoid using ``rsa-sha256``, ``rsa-sha512`` as they are deprecated. These values are
         available for server-side applications that only support the older
         HTTP signature algorithms.
     :param private_key_path: A string value specifying the path of the file containing
@@ -78,35 +81,50 @@ class HttpSigningConfiguration:
         the private key.
     :param signed_headers: A list of strings. Each value is the name of a HTTP header
         that must be included in the HTTP signature calculation.
-        The two special signature headers '(request-target)' and '(created)' SHOULD be
-        included in SignedHeaders.
-        The '(created)' header expresses when the signature was created.
-        The '(request-target)' header is a concatenation of the lowercased :method, an
+
+        The two special signature headers ``(request-target)`` and ``(created)`` SHOULD be
+        included in :attr:`signed_headers`.
+
+        The ``(created)`` header expresses when the signature was created.
+
+        The ``(request-target)`` header is a concatenation of the lowercased :method, an
         ASCII space, and the :path pseudo-headers.
+
         When signed_headers is not specified, the client defaults to a single value,
-        '(created)', in the list of HTTP headers.
-        When SignedHeaders contains the 'Digest' value, the client performs the
+        ``(created)``, in the list of HTTP headers.
+
+        When :attr:`signed_headers` contains the ``Digest`` value, the client performs the
         following operations:
-        1. Calculate a digest of request body, as specified in RFC3230, section 4.3.2.
-        2. Set the 'Digest' header in the request body.
-        3. Include the 'Digest' header and value in the HTTP signature.
+
+        1. Calculate a digest of request body, as specified in
+            `RFC3230, section 4.3.2 <https://datatracker.ietf.org/doc/html/rfc3230#section-4.3.2>`_.
+        2. Set the ``Digest`` header in the request body.
+        3. Include the ``Digest`` header and value in the HTTP signature.
     :param signing_algorithm: A string value specifying the signature algorithm, when
         signing HTTP requests.
+
         Supported values are:
-        1. For RSA keys: RSASSA-PSS, RSASSA-PKCS1-v1_5.
-        2. For ECDSA keys: fips-186-3, deterministic-rfc6979.
-        If None, the signing algorithm is inferred from the private key.
-        The default signing algorithm for RSA keys is RSASSA-PSS.
-        The default signing algorithm for ECDSA keys is fips-186-3.
+
+        1. For RSA keys: ``RSASSA-PSS``, ``RSASSA-PKCS1-v1_5``.
+        2. For ECDSA keys: ``fips-186-3``, ``deterministic-rfc6979``.
+
+        If ``None``, the signing algorithm is inferred from the private key.
+
+        The default signing algorithm for RSA keys is ``RSASSA-PSS``.
+
+        The default signing algorithm for ECDSA keys is ``fips-186-3``.
     :param hash_algorithm: The hash algorithm for the signature. Supported values are
-        sha256 and sha512.
-        If the signing_scheme is rsa-sha256, the hash algorithm must be set
-        to None or sha256.
-        If the signing_scheme is rsa-sha512, the hash algorithm must be set
-        to None or sha512.
+        ``sha256`` and ``sha512``.
+
+        If the :attr:`signing_scheme` is ``rsa-sha256``, the hash algorithm must be set
+        to ``None`` or ``sha256``.
+
+        If the :attr:`signing_scheme` is ``rsa-sha512``, the hash algorithm must be set
+        to ``None`` or ``sha512``.
     :param signature_max_validity: The signature max validity, expressed as
-        a datetime.timedelta value. It must be a positive value.
+        a :class:`datetime.timedelta` value. It must be a positive value.
     """
+
     def __init__(self, key_id, signing_scheme, private_key_path,
                  private_key_passphrase=None,
                  signed_headers=None,
@@ -168,7 +186,7 @@ class HttpSigningConfiguration:
     def get_http_signature_headers(self, resource_path, method, headers, body, query_params):
         """Create a cryptographic message signature for the HTTP request and add the signed headers.
 
-        :param resource_path : A string representation of the HTTP request resource path.
+        :param resource_path: A string representation of the HTTP request resource path.
         :param method: A string representation of the HTTP request method, e.g. GET, POST.
         :param headers: A dict containing the HTTP request headers.
         :param body: The object representing the HTTP request body.
@@ -253,7 +271,7 @@ class HttpSigningConfiguration:
         """Build the HTTP headers (name, value) that need to be included in
         the HTTP signature scheme.
 
-        :param resource_path : A string representation of the HTTP request resource path.
+        :param resource_path: A string representation of the HTTP request resource path.
         :param method: A string representation of the HTTP request method, e.g. GET, POST.
         :param headers: A dict containing the HTTP request headers.
         :param body: The object (e.g. a dict) representing the HTTP request body.

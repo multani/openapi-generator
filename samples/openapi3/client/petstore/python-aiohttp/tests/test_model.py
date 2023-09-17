@@ -1,10 +1,5 @@
 # coding: utf-8
 
-# flake8: noqa
-
-
-import os
-import time
 import unittest
 
 import petstore_api

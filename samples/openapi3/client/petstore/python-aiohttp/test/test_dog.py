@@ -19,6 +19,9 @@ import petstore_api
 from petstore_api.models.dog import Dog  # noqa: E501
 from petstore_api.rest import ApiException
 
+
+
+
 class TestDog(unittest.TestCase):
     """Dog unit test stubs"""
 

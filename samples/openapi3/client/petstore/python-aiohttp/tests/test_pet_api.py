@@ -1,7 +1,5 @@
 # coding: utf-8
 
-# flake8: noqa
-
 """
 Run the tests.
 $ docker pull swaggerapi/petstore
@@ -9,195 +7,202 @@ $ docker run -d -e SWAGGER_HOST=http://petstore.swagger.io -e SWAGGER_BASE_PATH=
 $ pytest -vv
 """
 
-import os
-import unittest
 import asyncio
+import os
+
 import pytest
+import pytest_asyncio
+from aiohttp.client_exceptions import ClientProxyConnectionError
 
 import petstore_api
 from petstore_api import Configuration
 from petstore_api.rest import ApiException
 
-from .util import id_gen, async_test
+from .util import id_gen
 
-import json
-
-import urllib3
-
-HOST = 'http://localhost:80/v2'
+HOST = "http://localhost:80/v2"
 
 
-class TestPetApiTests(unittest.TestCase):
+@pytest_asyncio.fixture
+async def api_client():
+    config = Configuration()
+    config.host = HOST
 
-    def setUp(self):
-        config = Configuration()
-        config.host = HOST
-
-        self.api_client = petstore_api.ApiClient(config)
-        self.pet_api = petstore_api.PetApi(self.api_client)
-        self.setUpModels()
-        self.setUpFiles()
-
-    def setUpModels(self):
-        self.category = petstore_api.Category(id=id_gen(), name="dog")
-        #self.category.id = id_gen()
-        #self.category.name = "dog"
-        self.tag = petstore_api.Tag()
-        self.tag.id = id_gen()
-        self.tag.name = "openapi-generator-python-pet-tag"
-        self.pet = petstore_api.Pet(name="hello kity", photo_urls=["http://foo.bar.com/1", "http://foo.bar.com/2"])
-        self.pet.id = id_gen()
-        self.pet.status = "sold"
-        self.pet.category = self.category
-        self.pet.tags = [self.tag]
-
-    def setUpFiles(self):
-        self.test_file_dir = os.path.join(os.path.dirname(__file__), "..", "testfiles")
-        self.test_file_dir = os.path.realpath(self.test_file_dir)
-        self.foo = os.path.join(self.test_file_dir, "foo.png")
-
-    def test_separate_default_client_instances(self):
-        pet_api = petstore_api.PetApi()
-        pet_api2 = petstore_api.PetApi()
-        self.assertEqual(id(pet_api.api_client), id(pet_api2.api_client))
-
-    def test_separate_default_config_instances(self):
-        pet_api = petstore_api.PetApi()
-        pet_api2 = petstore_api.PetApi()
-        self.assertEqual(id(pet_api.api_client.configuration), id(pet_api2.api_client.configuration))
-
-    @async_test
-    async def test_async_with_result(self):
-        await self.pet_api.add_pet(self.pet)
-
-        calls = [self.pet_api.get_pet_by_id(self.pet.id),
-                 self.pet_api.get_pet_by_id(self.pet.id)]
-
-        responses, _ = await asyncio.wait(calls)
-        for response in responses:
-            self.assertEqual(response.result().id, self.pet.id)
-        self.assertEqual(len(responses), 2)
-
-    @async_test
-    async def test_exception(self):
-        await self.pet_api.add_pet(self.pet)
-
-        try:
-            await self.pet_api.get_pet_by_id(9999999999999)
-        except ApiException as e:
-            exception = e
-
-        self.assertIsInstance(exception, ApiException)
-        self.assertEqual(exception.status, 404)
-
-    @async_test
-    async def test_add_pet_and_get_pet_by_id(self):
-        await self.pet_api.add_pet(self.pet)
-
-        fetched = await self.pet_api.get_pet_by_id(pet_id=self.pet.id)
-        self.assertIsNotNone(fetched)
-        self.assertEqual(self.pet.id, fetched.id)
-        self.assertIsNotNone(fetched.category)
-        self.assertEqual(self.pet.category.name, fetched.category.name)
-
-    @async_test
-    async def test_add_pet_and_get_pet_by_id_with_http_info(self):
-        await self.pet_api.add_pet(self.pet)
-
-        fetched = await self.pet_api.get_pet_by_id_with_http_info(pet_id=self.pet.id)
-        self.assertIsNotNone(fetched)
-        self.assertEqual(self.pet.id, fetched.data.id)
-        self.assertIsNotNone(fetched.data.category)
-        self.assertEqual(self.pet.category.name, fetched.data.category.name)
-
-    @async_test
-    async def test_update_pet(self):
-        self.pet.name = "hello kity with updated"
-        await self.pet_api.update_pet(self.pet)
-
-        fetched = await self.pet_api.get_pet_by_id(pet_id=self.pet.id)
-        self.assertIsNotNone(fetched)
-        self.assertEqual(self.pet.id, fetched.id)
-        self.assertEqual(self.pet.name, fetched.name)
-        self.assertIsNotNone(fetched.category)
-        self.assertEqual(fetched.category.name, self.pet.category.name)
-
-    @async_test
-    async def test_find_pets_by_status(self):
-        await self.pet_api.add_pet(self.pet)
-        pets = await self.pet_api.find_pets_by_status(status=[self.pet.status])
-        self.assertIn(
-            self.pet.id,
-            list(map(lambda x: getattr(x, 'id'), pets))
-        )
-
-    @async_test
-    async def test_find_pets_by_tags(self):
-        await self.pet_api.add_pet(self.pet)
-        pets = await self.pet_api.find_pets_by_tags(tags=[self.tag.name])
-        self.assertIn(
-            self.pet.id,
-            list(map(lambda x: getattr(x, 'id'), pets))
-        )
-
-    @async_test
-    async def test_update_pet_with_form(self):
-        await self.pet_api.add_pet(self.pet)
-
-        name = "hello kity with form updated"
-        status = "pending"
-        await self.pet_api.update_pet_with_form(pet_id=self.pet.id, name=name, status=status)
-
-        fetched = await self.pet_api.get_pet_by_id(pet_id=self.pet.id)
-        self.assertEqual(self.pet.id, fetched.id)
-        self.assertEqual(name, fetched.name)
-        self.assertEqual(status, fetched.status)
-
-    @async_test
-    async def test_upload_file(self):
-        # upload file with form parameter
-        try:
-            additional_metadata = "special"
-            await self.pet_api.upload_file(
-                pet_id=self.pet.id,
-                additional_metadata=additional_metadata,
-                file=self.foo
-            )
-        except ApiException as e:
-            self.fail("upload_file() raised {0} unexpectedly".format(type(e)))
-
-        # upload only file
-        try:
-            await self.pet_api.upload_file(pet_id=self.pet.id, file=self.foo)
-        except ApiException as e:
-            self.fail("upload_file() raised {0} unexpectedly".format(type(e)))
-
-    @async_test
-    async def test_delete_pet(self):
-        await self.pet_api.add_pet(self.pet)
-        await self.pet_api.delete_pet(pet_id=self.pet.id, api_key="special-key")
-
-        try:
-            await self.pet_api.get_pet_by_id(pet_id=self.pet.id)
-            raise Exception("expected an error")
-        except ApiException as e:
-            self.assertEqual(404, e.status)
-
-    @async_test
-    async def test_proxy(self):
-        config = Configuration()
-        # set not-existent proxy and catch an error to verify that
-        # the client library (aiohttp) tried to use it.
-        config.proxy = 'http://localhost:8080/proxy'
-        async with petstore_api.ApiClient(config) as client:
-            pet_api = petstore_api.PetApi(client)
-
-            with self.assertRaisesRegex(petstore_api.rest.aiohttp.client_exceptions.ClientProxyConnectionError,
-                                        'Cannot connect to host localhost:8080'):
-                await pet_api.get_pet_by_id(self.pet.id)
+    async with petstore_api.ApiClient(config) as client:
+        yield client
 
 
-if __name__ == '__main__':
-    import logging
-    logging.basicConfig(level=logging.DEBUG)
-    unittest.main()
+@pytest_asyncio.fixture
+async def pet_api(api_client):
+    yield petstore_api.PetApi(api_client)
+
+
+@pytest.fixture
+def pet(tag):
+    category = petstore_api.Category(id=id_gen(), name="dog")
+    tag = petstore_api.Tag()
+    tag.id = id_gen()
+    tag.name = "openapi-generator-python-pet-tag"
+    pet = petstore_api.Pet(
+        name="hello kity", photo_urls=["http://foo.bar.com/1", "http://foo.bar.com/2"]
+    )
+    pet.id = id_gen()
+    pet.status = "sold"
+    pet.category = category
+    pet.tags = [tag]
+    yield pet
+
+
+@pytest.fixture
+def tag():
+    tag = petstore_api.Tag()
+    tag.id = id_gen()
+    tag.name = "openapi-generator-python-pet-tag"
+    yield tag
+
+
+@pytest.fixture
+def random_file():
+    test_file_dir = os.path.join(os.path.dirname(__file__), "..", "testfiles")
+    test_file_dir = os.path.realpath(test_file_dir)
+    foo = os.path.join(test_file_dir, "foo.png")
+    yield foo
+
+
+@pytest.mark.asyncio
+async def test_separate_default_client_instances():
+    pet_api = petstore_api.PetApi()
+    pet_api2 = petstore_api.PetApi()
+    assert id(pet_api.api_client) == id(pet_api2.api_client)
+
+
+@pytest.mark.asyncio
+async def test_separate_default_config_instances():
+    pet_api = petstore_api.PetApi()
+    pet_api2 = petstore_api.PetApi()
+    assert id(pet_api.api_client.configuration) == id(pet_api2.api_client.configuration)
+
+
+@pytest.mark.asyncio
+async def test_async_with_result(pet_api, pet):
+    await pet_api.add_pet(pet)
+
+    calls = [
+        asyncio.create_task(pet_api.get_pet_by_id(pet.id)),
+        asyncio.create_task(pet_api.get_pet_by_id(pet.id)),
+    ]
+
+    responses, _ = await asyncio.wait(calls)
+    for response in responses:
+        assert response.result().id == pet.id
+
+    assert len(responses) == 2
+
+
+@pytest.mark.asyncio
+async def test_exception(pet_api, pet):
+    await pet_api.add_pet(pet)
+
+    with pytest.raises(ApiException) as exc:
+        await pet_api.get_pet_by_id(9999999999999)
+
+    assert exc.value.status == 404
+
+
+@pytest.mark.asyncio
+async def test_add_pet_and_get_pet_by_id(pet_api, pet):
+    await pet_api.add_pet(pet)
+
+    fetched = await pet_api.get_pet_by_id(pet_id=pet.id)
+    assert fetched is not None
+    assert pet.id == fetched.id
+    assert pet.category.name == fetched.category.name
+
+
+@pytest.mark.asyncio
+async def test_add_pet_and_get_pet_by_id_with_http_info(pet_api, pet):
+    await pet_api.add_pet(pet)
+
+    fetched = await pet_api.get_pet_by_id_with_http_info(pet_id=pet.id)
+    assert fetched is not None
+    assert pet.id == fetched.data.id
+    assert pet.category.name == fetched.data.category.name
+
+
+@pytest.mark.asyncio
+async def test_update_pet(pet_api, pet):
+    pet.name = "hello kity with updated"
+    await pet_api.update_pet(pet)
+
+    fetched = await pet_api.get_pet_by_id(pet_id=pet.id)
+    assert fetched is not None
+    assert pet.id == fetched.id
+    assert pet.name == fetched.name
+    assert pet.category.name == fetched.category.name
+
+
+@pytest.mark.asyncio
+async def test_find_pets_by_status(pet_api, pet):
+    await pet_api.add_pet(pet)
+    pets = await pet_api.find_pets_by_status(status=[pet.status])
+
+    assert pet.id in [x.id for x in pets]
+
+
+@pytest.mark.asyncio
+async def test_find_pets_by_tags(pet_api, pet, tag):
+    await pet_api.add_pet(pet)
+    pets = await pet_api.find_pets_by_tags(tags=[tag.name])
+    assert pet.id in [x.id for x in pets]
+
+
+@pytest.mark.asyncio
+async def test_update_pet_with_form(pet_api, pet):
+    await pet_api.add_pet(pet)
+
+    name = "hello kity with form updated"
+    status = "pending"
+    await pet_api.update_pet_with_form(pet_id=pet.id, name=name, status=status)
+
+    fetched = await pet_api.get_pet_by_id(pet_id=pet.id)
+    assert pet.id == fetched.id
+    assert name == fetched.name
+    assert status == fetched.status
+
+
+@pytest.mark.asyncio
+async def test_upload_file(pet_api, pet, random_file):
+    # upload file with form parameter
+    additional_metadata = "special"
+    await pet_api.upload_file(
+        pet_id=pet.id, additional_metadata=additional_metadata, file=random_file
+    )
+
+    # upload only file
+    await pet_api.upload_file(pet_id=pet.id, file=random_file)
+
+
+@pytest.mark.asyncio
+async def test_delete_pet(pet_api, pet):
+    await pet_api.add_pet(pet)
+    await pet_api.delete_pet(pet_id=pet.id, api_key="special-key")
+
+    with pytest.raises(ApiException) as exc:
+        await pet_api.get_pet_by_id(pet_id=pet.id)
+
+    assert exc.value.status == 404
+
+
+@pytest.mark.asyncio
+async def test_proxy(pet_api, pet):
+    config = Configuration()
+    # set not-existent proxy and catch an error to verify that
+    # the client library (aiohttp) tried to use it.
+    config.proxy = "http://localhost:8080/proxy"
+    async with petstore_api.ApiClient(config) as client:
+        pet_api = petstore_api.PetApi(client)
+
+        with pytest.raises(
+            ClientProxyConnectionError, match=r"Cannot connect to host localhost:8080"
+        ):
+            await pet_api.get_pet_by_id(pet.id)
