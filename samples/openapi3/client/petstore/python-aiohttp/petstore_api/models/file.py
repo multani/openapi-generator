@@ -66,7 +66,7 @@ class File(BaseModel):
             return File.parse_obj(obj)
 
         _obj = File.parse_obj({
-            "source_uri": obj.get("sourceURI")
+            "sourceURI": obj.get("sourceURI")
         })
         return _obj
 

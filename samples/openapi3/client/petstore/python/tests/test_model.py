@@ -332,16 +332,19 @@ class ModelTests(unittest.TestCase):
 
     def test_list(self):
         # should throw exception as var_123_list should be string
+        kw = {"123-list": 123}
         try:
-            l3 = petstore_api.List(var_123_list=123)
+            l3 = petstore_api.List(**kw)
             self.assertTrue(False)  # this line shouldn't execute
+            breakpoint()
         except ValueError as e:
             #   var_123_list
             #     Input should be a valid string [type=string_type, input_value=123, input_type=int]
             #       For further information visit https://errors.pydantic.dev/2.3/v/string_type
             self.assertTrue("Input should be a valid string" in str(e))
 
-        l = petstore_api.List(var_123_list="bulldog")
+        kw = {"123-list": "bulldog"}
+        l = petstore_api.List(**kw)
         self.assertEqual(l.to_json(), '{"123-list": "bulldog"}')
         self.assertEqual(l.to_dict(), {'123-list': 'bulldog'})
         l2 = petstore_api.List.from_json(l.to_json())
@@ -474,7 +477,7 @@ class ModelTests(unittest.TestCase):
         self.assertEqual(pet_ap2.additional_properties["dict"], {"key999": "value999"})
 
     def test_nullable(self):
-        h = petstore_api.HealthCheckResult(nullable_message="Not none")
+        h = petstore_api.HealthCheckResult(NullableMessage="Not none")
         self.assertEqual(h.to_json(), '{"NullableMessage": "Not none"}')
 
         h.nullable_message = None

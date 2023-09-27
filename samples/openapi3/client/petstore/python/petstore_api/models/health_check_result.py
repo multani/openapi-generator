@@ -78,7 +78,7 @@ class HealthCheckResult(BaseModel):
             return HealthCheckResult.parse_obj(obj)
 
         _obj = HealthCheckResult.parse_obj({
-            "nullable_message": obj.get("NullableMessage")
+            "NullableMessage": obj.get("NullableMessage")
         })
         # store additional fields in additional_properties
         for _key in obj.keys():

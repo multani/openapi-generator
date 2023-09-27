@@ -73,7 +73,7 @@ class ModelReturn(BaseModel):
             return ModelReturn.parse_obj(obj)
 
         _obj = ModelReturn.parse_obj({
-            "var_return": obj.get("return")
+            "return": obj.get("return")
         })
         # store additional fields in additional_properties
         for _key in obj.keys():

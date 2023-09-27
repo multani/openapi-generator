@@ -82,12 +82,12 @@ class User(BaseModel):
         _obj = User.parse_obj({
             "id": obj.get("id"),
             "username": obj.get("username"),
-            "first_name": obj.get("firstName"),
-            "last_name": obj.get("lastName"),
+            "firstName": obj.get("firstName"),
+            "lastName": obj.get("lastName"),
             "email": obj.get("email"),
             "password": obj.get("password"),
             "phone": obj.get("phone"),
-            "user_status": obj.get("userStatus")
+            "userStatus": obj.get("userStatus")
         })
         # store additional fields in additional_properties
         for _key in obj.keys():

@@ -71,7 +71,7 @@ class HealthCheckResult(BaseModel):
             return HealthCheckResult.parse_obj(obj)
 
         _obj = HealthCheckResult.parse_obj({
-            "nullable_message": obj.get("NullableMessage")
+            "NullableMessage": obj.get("NullableMessage")
         })
         return _obj
 

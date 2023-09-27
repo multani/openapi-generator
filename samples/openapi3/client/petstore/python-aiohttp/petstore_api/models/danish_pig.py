@@ -67,7 +67,7 @@ class DanishPig(BaseModel):
             return DanishPig.parse_obj(obj)
 
         _obj = DanishPig.parse_obj({
-            "class_name": obj.get("className"),
+            "className": obj.get("className"),
             "size": obj.get("size")
         })
         return _obj

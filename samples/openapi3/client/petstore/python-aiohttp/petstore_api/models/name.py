@@ -73,8 +73,8 @@ class Name(BaseModel):
         _obj = Name.parse_obj({
             "name": obj.get("name"),
             "snake_case": obj.get("snake_case"),
-            "var_property": obj.get("property"),
-            "var_123_number": obj.get("123Number")
+            "property": obj.get("property"),
+            "123Number": obj.get("123Number")
         })
         return _obj
 

@@ -73,7 +73,7 @@ class NumberOnly(BaseModel):
             return NumberOnly.parse_obj(obj)
 
         _obj = NumberOnly.parse_obj({
-            "just_number": obj.get("JustNumber")
+            "JustNumber": obj.get("JustNumber")
         })
         # store additional fields in additional_properties
         for _key in obj.keys():

@@ -73,7 +73,7 @@ class ObjectToTestAdditionalProperties(BaseModel):
             return ObjectToTestAdditionalProperties.parse_obj(obj)
 
         _obj = ObjectToTestAdditionalProperties.parse_obj({
-            "var_property": obj.get("property") if obj.get("property") is not None else False
+            "property": obj.get("property") if obj.get("property") is not None else False
         })
         # store additional fields in additional_properties
         for _key in obj.keys():

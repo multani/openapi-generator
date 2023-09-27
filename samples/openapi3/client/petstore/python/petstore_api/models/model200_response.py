@@ -75,7 +75,7 @@ class Model200Response(BaseModel):
 
         _obj = Model200Response.parse_obj({
             "name": obj.get("name"),
-            "var_class": obj.get("class")
+            "class": obj.get("class")
         })
         # store additional fields in additional_properties
         for _key in obj.keys():

@@ -76,7 +76,7 @@ class AllOfWithSingleRef(BaseModel):
 
         _obj = AllOfWithSingleRef.parse_obj({
             "username": obj.get("username"),
-            "single_ref_type": obj.get("SingleRefType")
+            "SingleRefType": obj.get("SingleRefType")
         })
         # store additional fields in additional_properties
         for _key in obj.keys():

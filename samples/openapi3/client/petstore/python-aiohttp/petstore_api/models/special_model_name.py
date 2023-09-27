@@ -66,7 +66,7 @@ class SpecialModelName(BaseModel):
             return SpecialModelName.parse_obj(obj)
 
         _obj = SpecialModelName.parse_obj({
-            "special_property_name": obj.get("$special[property.name]")
+            "$special[property.name]": obj.get("$special[property.name]")
         })
         return _obj
 

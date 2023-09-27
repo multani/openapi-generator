@@ -73,7 +73,7 @@ class List(BaseModel):
             return List.parse_obj(obj)
 
         _obj = List.parse_obj({
-            "var_123_list": obj.get("123-list")
+            "123-list": obj.get("123-list")
         })
         # store additional fields in additional_properties
         for _key in obj.keys():

@@ -142,10 +142,10 @@ class EnumTest(BaseModel):
             "enum_integer_default": obj.get("enum_integer_default") if obj.get("enum_integer_default") is not None else 5,
             "enum_integer": obj.get("enum_integer"),
             "enum_number": obj.get("enum_number"),
-            "outer_enum": obj.get("outerEnum"),
-            "outer_enum_integer": obj.get("outerEnumInteger"),
-            "outer_enum_default_value": obj.get("outerEnumDefaultValue"),
-            "outer_enum_integer_default_value": obj.get("outerEnumIntegerDefaultValue")
+            "outerEnum": obj.get("outerEnum"),
+            "outerEnumInteger": obj.get("outerEnumInteger"),
+            "outerEnumDefaultValue": obj.get("outerEnumDefaultValue"),
+            "outerEnumIntegerDefaultValue": obj.get("outerEnumIntegerDefaultValue")
         })
         # store additional fields in additional_properties
         for _key in obj.keys():

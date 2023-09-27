@@ -66,7 +66,7 @@ class ClassModel(BaseModel):
             return ClassModel.parse_obj(obj)
 
         _obj = ClassModel.parse_obj({
-            "var_class": obj.get("_class")
+            "_class": obj.get("_class")
         })
         return _obj
 

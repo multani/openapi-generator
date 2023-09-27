@@ -71,12 +71,12 @@ class Capitalization(BaseModel):
             return Capitalization.parse_obj(obj)
 
         _obj = Capitalization.parse_obj({
-            "small_camel": obj.get("smallCamel"),
-            "capital_camel": obj.get("CapitalCamel"),
-            "small_snake": obj.get("small_Snake"),
-            "capital_snake": obj.get("Capital_Snake"),
-            "sca_eth_flow_points": obj.get("SCA_ETH_Flow_Points"),
-            "att_name": obj.get("ATT_NAME")
+            "smallCamel": obj.get("smallCamel"),
+            "CapitalCamel": obj.get("CapitalCamel"),
+            "small_Snake": obj.get("small_Snake"),
+            "Capital_Snake": obj.get("Capital_Snake"),
+            "SCA_ETH_Flow_Points": obj.get("SCA_ETH_Flow_Points"),
+            "ATT_NAME": obj.get("ATT_NAME")
         })
         return _obj
 

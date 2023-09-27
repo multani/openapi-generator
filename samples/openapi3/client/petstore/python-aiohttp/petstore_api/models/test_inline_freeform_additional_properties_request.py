@@ -73,7 +73,7 @@ class TestInlineFreeformAdditionalPropertiesRequest(BaseModel):
             return TestInlineFreeformAdditionalPropertiesRequest.parse_obj(obj)
 
         _obj = TestInlineFreeformAdditionalPropertiesRequest.parse_obj({
-            "some_property": obj.get("someProperty")
+            "someProperty": obj.get("someProperty")
         })
         # store additional fields in additional_properties
         for _key in obj.keys():

@@ -73,7 +73,7 @@ class ArrayOfArrayOfNumberOnly(BaseModel):
             return ArrayOfArrayOfNumberOnly.parse_obj(obj)
 
         _obj = ArrayOfArrayOfNumberOnly.parse_obj({
-            "array_array_number": obj.get("ArrayArrayNumber")
+            "ArrayArrayNumber": obj.get("ArrayArrayNumber")
         })
         # store additional fields in additional_properties
         for _key in obj.keys():

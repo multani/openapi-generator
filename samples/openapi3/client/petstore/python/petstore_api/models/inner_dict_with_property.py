@@ -73,7 +73,7 @@ class InnerDictWithProperty(BaseModel):
             return InnerDictWithProperty.parse_obj(obj)
 
         _obj = InnerDictWithProperty.parse_obj({
-            "a_property": obj.get("aProperty")
+            "aProperty": obj.get("aProperty")
         })
         # store additional fields in additional_properties
         for _key in obj.keys():

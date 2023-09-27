@@ -82,9 +82,9 @@ class Order(BaseModel):
 
         _obj = Order.parse_obj({
             "id": obj.get("id"),
-            "pet_id": obj.get("petId"),
+            "petId": obj.get("petId"),
             "quantity": obj.get("quantity"),
-            "ship_date": obj.get("shipDate"),
+            "shipDate": obj.get("shipDate"),
             "status": obj.get("status"),
             "complete": obj.get("complete") if obj.get("complete") is not None else False
         })

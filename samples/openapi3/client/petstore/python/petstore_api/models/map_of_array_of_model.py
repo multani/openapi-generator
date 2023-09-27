@@ -83,7 +83,7 @@ class MapOfArrayOfModel(BaseModel):
             return MapOfArrayOfModel.parse_obj(obj)
 
         _obj = MapOfArrayOfModel.parse_obj({
-            "shop_id_to_org_online_lip_map": dict(
+            "shopIdToOrgOnlineLipMap": dict(
                 (_k,
                         [Tag.from_dict(_item) for _item in _v]
                         if _v is not None

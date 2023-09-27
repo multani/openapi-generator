@@ -75,9 +75,9 @@ class PropertyNameCollision(BaseModel):
             return PropertyNameCollision.parse_obj(obj)
 
         _obj = PropertyNameCollision.parse_obj({
-            "underscore_type": obj.get("_type"),
+            "_type": obj.get("_type"),
             "type": obj.get("type"),
-            "type_with_underscore": obj.get("type_")
+            "type_": obj.get("type_")
         })
         # store additional fields in additional_properties
         for _key in obj.keys():

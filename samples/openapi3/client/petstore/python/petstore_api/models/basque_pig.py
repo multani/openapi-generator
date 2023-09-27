@@ -74,7 +74,7 @@ class BasquePig(BaseModel):
             return BasquePig.parse_obj(obj)
 
         _obj = BasquePig.parse_obj({
-            "class_name": obj.get("className"),
+            "className": obj.get("className"),
             "color": obj.get("color")
         })
         # store additional fields in additional_properties

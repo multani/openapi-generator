@@ -68,7 +68,7 @@ class PropertyNameCollision(BaseModel):
             return PropertyNameCollision.parse_obj(obj)
 
         _obj = PropertyNameCollision.parse_obj({
-            "type": obj.get("_type"),
+            "_type": obj.get("_type"),
             "type": obj.get("type"),
             "type_": obj.get("type_")
         })

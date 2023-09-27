@@ -89,9 +89,9 @@ class SpecialName(BaseModel):
             return SpecialName.parse_obj(obj)
 
         _obj = SpecialName.parse_obj({
-            "var_property": obj.get("property"),
-            "var_async": Category.from_dict(obj.get("async")) if obj.get("async") is not None else None,
-            "var_schema": obj.get("schema")
+            "property": obj.get("property"),
+            "async": Category.from_dict(obj.get("async")) if obj.get("async") is not None else None,
+            "schema": obj.get("schema")
         })
         # store additional fields in additional_properties
         for _key in obj.keys():

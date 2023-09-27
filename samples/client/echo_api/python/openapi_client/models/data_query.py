@@ -74,7 +74,7 @@ class DataQuery(Query):
             "outcomes": obj.get("outcomes"),
             "suffix": obj.get("suffix"),
             "text": obj.get("text"),
-            "var_date": obj.get("date")
+            "date": obj.get("date")
         })
         return _obj
 

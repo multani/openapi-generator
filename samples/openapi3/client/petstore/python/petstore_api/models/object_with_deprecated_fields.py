@@ -82,7 +82,7 @@ class ObjectWithDeprecatedFields(BaseModel):
         _obj = ObjectWithDeprecatedFields.parse_obj({
             "uuid": obj.get("uuid"),
             "id": obj.get("id"),
-            "deprecated_ref": DeprecatedObject.from_dict(obj.get("deprecatedRef")) if obj.get("deprecatedRef") is not None else None,
+            "deprecatedRef": DeprecatedObject.from_dict(obj.get("deprecatedRef")) if obj.get("deprecatedRef") is not None else None,
             "bars": obj.get("bars")
         })
         # store additional fields in additional_properties
