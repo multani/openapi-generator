@@ -26,7 +26,7 @@ class ArrayOfNumberOnly(BaseModel):
     """
     ArrayOfNumberOnly
     """
-    array_number: Optional[List[StrictFloat]] = Field(default=None, serialization_alias="ArrayNumber")
+    array_number: Optional[List[StrictFloat]] = Field(default=None, alias="ArrayNumber")
     additional_properties: Dict[str, Any] = {}
     __properties = ["ArrayNumber"]
 

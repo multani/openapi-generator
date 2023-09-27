@@ -26,7 +26,7 @@ class InnerDictWithProperty(BaseModel):
     """
     InnerDictWithProperty
     """
-    a_property: Optional[Union[str, Any]] = Field(default=None, serialization_alias="aProperty")
+    a_property: Optional[Union[str, Any]] = Field(default=None, alias="aProperty")
     additional_properties: Dict[str, Any] = {}
     __properties = ["aProperty"]
 

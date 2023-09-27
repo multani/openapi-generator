@@ -26,7 +26,7 @@ class NumberOnly(BaseModel):
     """
     NumberOnly
     """
-    just_number: Optional[float] = Field(default=None, serialization_alias="JustNumber")
+    just_number: Optional[float] = Field(default=None, alias="JustNumber")
     __properties = ["JustNumber"]
 
     class Config:

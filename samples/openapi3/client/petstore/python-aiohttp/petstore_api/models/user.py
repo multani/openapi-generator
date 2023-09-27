@@ -28,12 +28,12 @@ class User(BaseModel):
     """
     id: Optional[StrictInt] = None
     username: Optional[StrictStr] = None
-    first_name: Optional[StrictStr] = Field(default=None, serialization_alias="firstName")
-    last_name: Optional[StrictStr] = Field(default=None, serialization_alias="lastName")
+    first_name: Optional[StrictStr] = Field(default=None, alias="firstName")
+    last_name: Optional[StrictStr] = Field(default=None, alias="lastName")
     email: Optional[StrictStr] = None
     password: Optional[StrictStr] = None
     phone: Optional[StrictStr] = None
-    user_status: Optional[StrictInt] = Field(default=None, serialization_alias="userStatus", description="User Status")
+    user_status: Optional[StrictInt] = Field(default=None, description="User Status", alias="userStatus")
     __properties = ["id", "username", "firstName", "lastName", "email", "password", "phone", "userStatus"]
 
     class Config:

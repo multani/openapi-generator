@@ -38,8 +38,8 @@ class FormatTest(BaseModel):
     string_with_double_quote_pattern: Optional[Annotated[str, Field(strict=True)]] = None
     byte: Optional[Union[StrictBytes, StrictStr]] = None
     binary: Optional[Union[StrictBytes, StrictStr]] = None
-    var_date: date = Field(serialization_alias="date")
-    date_time: Optional[datetime] = Field(default=None, serialization_alias="dateTime")
+    var_date: date = Field(alias="date")
+    date_time: Optional[datetime] = Field(default=None, alias="dateTime")
     uuid: Optional[StrictStr] = None
     password: Annotated[str, Field(min_length=10, strict=True, max_length=64)]
     pattern_with_digits: Optional[Annotated[str, Field(strict=True)]] = Field(default=None, description="A string that is a 10 digit number. Can have leading zeros.")

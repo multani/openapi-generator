@@ -26,7 +26,7 @@ class DanishPig(BaseModel):
     """
     DanishPig
     """
-    class_name: StrictStr = Field(serialization_alias="className")
+    class_name: StrictStr = Field(alias="className")
     size: StrictInt
     __properties = ["className", "size"]
 

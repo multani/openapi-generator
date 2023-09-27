@@ -26,7 +26,7 @@ class ClassModel(BaseModel):
     """
     Model for testing model with \"_class\" property  # noqa: E501
     """
-    var_class: Optional[StrictStr] = Field(default=None, serialization_alias="_class")
+    var_class: Optional[StrictStr] = Field(default=None, alias="_class")
     __properties = ["_class"]
 
     class Config:

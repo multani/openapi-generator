@@ -27,9 +27,9 @@ class SpecialName(BaseModel):
     """
     SpecialName
     """
-    var_property: Optional[StrictInt] = Field(default=None, serialization_alias="property")
-    var_async: Optional[Category] = Field(default=None, serialization_alias="async")
-    var_schema: Optional[StrictStr] = Field(default=None, serialization_alias="schema", description="pet status in the store")
+    var_property: Optional[StrictInt] = Field(default=None, alias="property")
+    var_async: Optional[Category] = Field(default=None, alias="async")
+    var_schema: Optional[StrictStr] = Field(default=None, description="pet status in the store", alias="schema")
     __properties = ["property", "async", "schema"]
 
     @validator('var_schema')

@@ -32,7 +32,7 @@ class Pet(BaseModel):
     id: Optional[StrictInt] = None
     category: Optional[Category] = None
     name: StrictStr
-    photo_urls: Annotated[List[StrictStr], Field(min_items=0)] = Field(serialization_alias="photoUrls")
+    photo_urls: Annotated[List[StrictStr], Field(min_items=0)] = Field(alias="photoUrls")
     tags: Optional[List[Tag]] = None
     status: Optional[StrictStr] = Field(default=None, description="pet status in the store")
     additional_properties: Dict[str, Any] = {}

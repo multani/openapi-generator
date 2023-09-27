@@ -28,8 +28,8 @@ class Name(BaseModel):
     """
     name: StrictInt
     snake_case: Optional[StrictInt] = None
-    var_property: Optional[StrictStr] = Field(default=None, serialization_alias="property")
-    var_123_number: Optional[StrictInt] = Field(default=None, serialization_alias="123Number")
+    var_property: Optional[StrictStr] = Field(default=None, alias="property")
+    var_123_number: Optional[StrictInt] = Field(default=None, alias="123Number")
     __properties = ["name", "snake_case", "property", "123Number"]
 
     class Config:

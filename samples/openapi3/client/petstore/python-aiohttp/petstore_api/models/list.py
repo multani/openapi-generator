@@ -26,7 +26,7 @@ class List(BaseModel):
     """
     List
     """
-    var_123_list: Optional[StrictStr] = Field(default=None, serialization_alias="123-list")
+    var_123_list: Optional[StrictStr] = Field(default=None, alias="123-list")
     __properties = ["123-list"]
 
     class Config:

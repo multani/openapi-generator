@@ -26,7 +26,7 @@ class PropertyNameCollision(BaseModel):
     """
     PropertyNameCollision
     """
-    type: Optional[StrictStr] = Field(default=None, serialization_alias="_type")
+    type: Optional[StrictStr] = Field(default=None, alias="_type")
     type: Optional[StrictStr] = None
     type_: Optional[StrictStr] = None
     __properties = ["_type", "type", "type_"]

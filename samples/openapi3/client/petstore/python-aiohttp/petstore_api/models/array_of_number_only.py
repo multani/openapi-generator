@@ -26,7 +26,7 @@ class ArrayOfNumberOnly(BaseModel):
     """
     ArrayOfNumberOnly
     """
-    array_number: Optional[List[float]] = Field(default=None, serialization_alias="ArrayNumber")
+    array_number: Optional[List[float]] = Field(default=None, alias="ArrayNumber")
     __properties = ["ArrayNumber"]
 
     class Config:
