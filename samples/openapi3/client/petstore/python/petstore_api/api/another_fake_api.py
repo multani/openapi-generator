@@ -23,7 +23,6 @@ from typing_extensions import Annotated
 from petstore_api.models.client import Client
 
 from petstore_api.api_client import ApiClient
-from petstore_api.api_response import ApiResponse
 from petstore_api.exceptions import (  # noqa: F401
     ApiTypeError,
     ApiValueError
@@ -73,7 +72,7 @@ class AnotherFakeApi:
         return self.call_123_test_special_tags_with_http_info(client, **kwargs)  # noqa: E501
 
     @validate_call
-    def call_123_test_special_tags_with_http_info(self, client : Annotated[Client, Field(description="client model")], **kwargs) -> ApiResponse:  # noqa: E501
+    def call_123_test_special_tags_with_http_info(self, client : Annotated[Client, Field(description="client model")], **kwargs) -> Client:  # noqa: E501
         """To test special tags  # noqa: E501
 
         To test special tags and operation ID starting with number  # noqa: E501
@@ -107,7 +106,7 @@ class AnotherFakeApi:
         :return: Returns the result object.
                  If the method is called asynchronously,
                  returns the request thread.
-        :rtype: tuple(Client, status_code(int), headers(HTTPHeaderDict))
+        :rtype: Client
         """
 
         _params = locals()

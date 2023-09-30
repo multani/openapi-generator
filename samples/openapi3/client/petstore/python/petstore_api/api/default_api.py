@@ -21,7 +21,6 @@ from pydantic import validate_call, ValidationError
 from petstore_api.models.foo_get_default_response import FooGetDefaultResponse
 
 from petstore_api.api_client import ApiClient
-from petstore_api.api_response import ApiResponse
 from petstore_api.exceptions import (  # noqa: F401
     ApiTypeError,
     ApiValueError
@@ -68,7 +67,7 @@ class DefaultApi:
         return self.foo_get_with_http_info(**kwargs)  # noqa: E501
 
     @validate_call
-    def foo_get_with_http_info(self, **kwargs) -> ApiResponse:  # noqa: E501
+    def foo_get_with_http_info(self, **kwargs) -> FooGetDefaultResponse:  # noqa: E501
         """foo_get  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
@@ -99,7 +98,7 @@ class DefaultApi:
         :return: Returns the result object.
                  If the method is called asynchronously,
                  returns the request thread.
-        :rtype: tuple(FooGetDefaultResponse, status_code(int), headers(HTTPHeaderDict))
+        :rtype: FooGetDefaultResponse
         """
 
         _params = locals()

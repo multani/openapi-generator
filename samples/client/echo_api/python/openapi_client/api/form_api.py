@@ -25,7 +25,6 @@ from typing import Optional
 
 
 from openapi_client.api_client import ApiClient
-from openapi_client.api_response import ApiResponse
 from openapi_client.exceptions import (  # noqa: F401
     ApiTypeError,
     ApiValueError
@@ -79,7 +78,7 @@ class FormApi:
         return self.test_form_integer_boolean_string_with_http_info(integer_form, boolean_form, string_form, **kwargs)  # noqa: E501
 
     @validate_call
-    def test_form_integer_boolean_string_with_http_info(self, integer_form : Optional[StrictInt] = None, boolean_form : Optional[StrictBool] = None, string_form : Optional[StrictStr] = None, **kwargs) -> ApiResponse:  # noqa: E501
+    def test_form_integer_boolean_string_with_http_info(self, integer_form : Optional[StrictInt] = None, boolean_form : Optional[StrictBool] = None, string_form : Optional[StrictStr] = None, **kwargs) -> str:  # noqa: E501
         """Test form parameter(s)  # noqa: E501
 
         Test form parameter(s)  # noqa: E501
@@ -117,7 +116,7 @@ class FormApi:
         :return: Returns the result object.
                  If the method is called asynchronously,
                  returns the request thread.
-        :rtype: tuple(str, status_code(int), headers(HTTPHeaderDict))
+        :rtype: str
         """
 
         _params = locals()
@@ -248,7 +247,7 @@ class FormApi:
         return self.test_form_oneof_with_http_info(form1, form2, form3, form4, id, name, **kwargs)  # noqa: E501
 
     @validate_call
-    def test_form_oneof_with_http_info(self, form1 : Optional[StrictStr] = None, form2 : Optional[StrictInt] = None, form3 : Optional[StrictStr] = None, form4 : Optional[StrictBool] = None, id : Optional[StrictInt] = None, name : Optional[StrictStr] = None, **kwargs) -> ApiResponse:  # noqa: E501
+    def test_form_oneof_with_http_info(self, form1 : Optional[StrictStr] = None, form2 : Optional[StrictInt] = None, form3 : Optional[StrictStr] = None, form4 : Optional[StrictBool] = None, id : Optional[StrictInt] = None, name : Optional[StrictStr] = None, **kwargs) -> str:  # noqa: E501
         """Test form parameter(s) for oneOf schema  # noqa: E501
 
         Test form parameter(s) for oneOf schema  # noqa: E501
@@ -292,7 +291,7 @@ class FormApi:
         :return: Returns the result object.
                  If the method is called asynchronously,
                  returns the request thread.
-        :rtype: tuple(str, status_code(int), headers(HTTPHeaderDict))
+        :rtype: str
         """
 
         _params = locals()

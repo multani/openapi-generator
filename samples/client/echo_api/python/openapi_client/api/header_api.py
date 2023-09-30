@@ -25,7 +25,6 @@ from typing import Optional
 
 
 from openapi_client.api_client import ApiClient
-from openapi_client.api_response import ApiResponse
 from openapi_client.exceptions import (  # noqa: F401
     ApiTypeError,
     ApiValueError
@@ -79,7 +78,7 @@ class HeaderApi:
         return self.test_header_integer_boolean_string_with_http_info(integer_header, boolean_header, string_header, **kwargs)  # noqa: E501
 
     @validate_call
-    def test_header_integer_boolean_string_with_http_info(self, integer_header : Optional[StrictInt] = None, boolean_header : Optional[StrictBool] = None, string_header : Optional[StrictStr] = None, **kwargs) -> ApiResponse:  # noqa: E501
+    def test_header_integer_boolean_string_with_http_info(self, integer_header : Optional[StrictInt] = None, boolean_header : Optional[StrictBool] = None, string_header : Optional[StrictStr] = None, **kwargs) -> str:  # noqa: E501
         """Test header parameter(s)  # noqa: E501
 
         Test header parameter(s)  # noqa: E501
@@ -117,7 +116,7 @@ class HeaderApi:
         :return: Returns the result object.
                  If the method is called asynchronously,
                  returns the request thread.
-        :rtype: tuple(str, status_code(int), headers(HTTPHeaderDict))
+        :rtype: str
         """
 
         _params = locals()

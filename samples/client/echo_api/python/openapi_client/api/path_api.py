@@ -23,7 +23,6 @@ from pydantic import StrictInt, StrictStr
 
 
 from openapi_client.api_client import ApiClient
-from openapi_client.api_response import ApiResponse
 from openapi_client.exceptions import (  # noqa: F401
     ApiTypeError,
     ApiValueError
@@ -75,7 +74,7 @@ class PathApi:
         return self.tests_path_string_path_string_integer_path_integer_with_http_info(path_string, path_integer, **kwargs)  # noqa: E501
 
     @validate_call
-    def tests_path_string_path_string_integer_path_integer_with_http_info(self, path_string : StrictStr, path_integer : StrictInt, **kwargs) -> ApiResponse:  # noqa: E501
+    def tests_path_string_path_string_integer_path_integer_with_http_info(self, path_string : StrictStr, path_integer : StrictInt, **kwargs) -> str:  # noqa: E501
         """Test path parameter(s)  # noqa: E501
 
         Test path parameter(s)  # noqa: E501
@@ -111,7 +110,7 @@ class PathApi:
         :return: Returns the result object.
                  If the method is called asynchronously,
                  returns the request thread.
-        :rtype: tuple(str, status_code(int), headers(HTTPHeaderDict))
+        :rtype: str
         """
 
         _params = locals()

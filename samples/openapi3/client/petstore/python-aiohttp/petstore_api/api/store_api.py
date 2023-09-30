@@ -27,7 +27,6 @@ from typing import Dict
 from petstore_api.models.order import Order
 
 from petstore_api.api_client import ApiClient
-from petstore_api.api_response import ApiResponse
 from petstore_api.exceptions import (  # noqa: F401
     ApiTypeError,
     ApiValueError
@@ -70,7 +69,7 @@ class StoreApi:
         return await self.delete_order_with_http_info(order_id, **kwargs)  # noqa: E501
 
     @validate_call
-    async def delete_order_with_http_info(self, order_id : Annotated[StrictStr, Field(description="ID of the order that needs to be deleted")], **kwargs) -> ApiResponse:  # noqa: E501
+    async def delete_order_with_http_info(self, order_id : Annotated[StrictStr, Field(description="ID of the order that needs to be deleted")], **kwargs) -> None:  # noqa: E501
         """Delete purchase order by ID  # noqa: E501
 
         For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors  # noqa: E501
@@ -186,7 +185,7 @@ class StoreApi:
         return await self.get_inventory_with_http_info(**kwargs)  # noqa: E501
 
     @validate_call
-    async def get_inventory_with_http_info(self, **kwargs) -> ApiResponse:  # noqa: E501
+    async def get_inventory_with_http_info(self, **kwargs) -> Dict[str, int]:  # noqa: E501
         """Returns pet inventories by status  # noqa: E501
 
         Returns a map of status codes to quantities  # noqa: E501
@@ -211,7 +210,7 @@ class StoreApi:
         :return: Returns the result object.
                  If the method is called asynchronously,
                  returns the request thread.
-        :rtype: tuple(Dict[str, int], status_code(int), headers(HTTPHeaderDict))
+        :rtype: Dict[str, int]
         """
 
         _params = locals()
@@ -304,7 +303,7 @@ class StoreApi:
         return await self.get_order_by_id_with_http_info(order_id, **kwargs)  # noqa: E501
 
     @validate_call
-    async def get_order_by_id_with_http_info(self, order_id : Annotated[int, Field(le=5, strict=True, ge=1, description="ID of pet that needs to be fetched")], **kwargs) -> ApiResponse:  # noqa: E501
+    async def get_order_by_id_with_http_info(self, order_id : Annotated[int, Field(le=5, strict=True, ge=1, description="ID of pet that needs to be fetched")], **kwargs) -> Order:  # noqa: E501
         """Find purchase order by ID  # noqa: E501
 
         For valid response try integer IDs with value <= 5 or > 10. Other values will generated exceptions  # noqa: E501
@@ -331,7 +330,7 @@ class StoreApi:
         :return: Returns the result object.
                  If the method is called asynchronously,
                  returns the request thread.
-        :rtype: tuple(Order, status_code(int), headers(HTTPHeaderDict))
+        :rtype: Order
         """
 
         _params = locals()
@@ -430,7 +429,7 @@ class StoreApi:
         return await self.place_order_with_http_info(order, **kwargs)  # noqa: E501
 
     @validate_call
-    async def place_order_with_http_info(self, order : Annotated[Order, Field(description="order placed for purchasing the pet")], **kwargs) -> ApiResponse:  # noqa: E501
+    async def place_order_with_http_info(self, order : Annotated[Order, Field(description="order placed for purchasing the pet")], **kwargs) -> Order:  # noqa: E501
         """Place an order for a pet  # noqa: E501
 
           # noqa: E501
@@ -457,7 +456,7 @@ class StoreApi:
         :return: Returns the result object.
                  If the method is called asynchronously,
                  returns the request thread.
-        :rtype: tuple(Order, status_code(int), headers(HTTPHeaderDict))
+        :rtype: Order
         """
 
         _params = locals()

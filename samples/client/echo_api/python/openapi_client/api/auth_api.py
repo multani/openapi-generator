@@ -21,7 +21,6 @@ from pydantic import validate_call, ValidationError
 
 
 from openapi_client.api_client import ApiClient
-from openapi_client.api_response import ApiResponse
 from openapi_client.exceptions import (  # noqa: F401
     ApiTypeError,
     ApiValueError
@@ -69,7 +68,7 @@ class AuthApi:
         return self.test_auth_http_basic_with_http_info(**kwargs)  # noqa: E501
 
     @validate_call
-    def test_auth_http_basic_with_http_info(self, **kwargs) -> ApiResponse:  # noqa: E501
+    def test_auth_http_basic_with_http_info(self, **kwargs) -> str:  # noqa: E501
         """To test HTTP basic authentication  # noqa: E501
 
         To test HTTP basic authentication  # noqa: E501
@@ -101,7 +100,7 @@ class AuthApi:
         :return: Returns the result object.
                  If the method is called asynchronously,
                  returns the request thread.
-        :rtype: tuple(str, status_code(int), headers(HTTPHeaderDict))
+        :rtype: str
         """
 
         _params = locals()
