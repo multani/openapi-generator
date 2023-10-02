@@ -57,7 +57,7 @@ PostParam = Tuple[
         str, # The value of the parameter
         Tuple[ # or a file: (inspired by https://urllib3.readthedocs.io/en/v2.0.5/user-guide.html#files-binary-data)
             str, # filename
-            bytes, # file data  
+            bytes, # file data
             str, # mime-type
         ],
     ]
