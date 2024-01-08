@@ -31,7 +31,7 @@ HOST = 'http://localhost:80/v2'
 
 class TestPetApiTests(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         config = Configuration()
         config.host = HOST
 
@@ -40,7 +40,7 @@ class TestPetApiTests(unittest.TestCase):
         self.setUpModels()
         self.setUpFiles()
 
-    def setUpModels(self):
+    def setUpModels(self) -> None:
         self.category = petstore_api.Category(id=id_gen(), name="dog")
         #self.category.id = id_gen()
         #self.category.name = "dog"
@@ -53,7 +53,7 @@ class TestPetApiTests(unittest.TestCase):
         self.pet.category = self.category
         self.pet.tags = [self.tag]
 
-    def setUpFiles(self):
+    def setUpFiles(self) -> None:
         self.test_file_dir = os.path.join(os.path.dirname(__file__), "..", "testfiles")
         self.test_file_dir = os.path.realpath(self.test_file_dir)
         self.foo = os.path.join(self.test_file_dir, "foo.png")

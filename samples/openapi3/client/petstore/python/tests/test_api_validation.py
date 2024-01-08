@@ -27,7 +27,7 @@ class ApiExceptionTests(unittest.TestCase):
         self.pet_api = petstore_api.PetApi(self.api_client)
         self.setUpModels()
 
-    def setUpModels(self):
+    def setUpModels(self) -> None:
         self.category = petstore_api.Category(name="dog")
         self.category.id = id_gen()
         self.category.name = "dog"

@@ -17,7 +17,8 @@ import json
 import os
 import re
 import shutil
-from typing import Union
+from typing import Any, List, Union
+from typing_extensions import Self
 import unittest
 from urllib.parse import urlencode, urlparse
 
@@ -70,27 +71,29 @@ G6aFKaqQfOXKCyWoUiVknQJAXrlgySFci/2ueKlIE1QqIiLSZ8V8OlpFLRnb1pzI
 
 
 class TimeoutWithEqual(urllib3.Timeout):
-    def __init__(self, *arg, **kwargs):
+    def __init__(self, *arg: Any, **kwargs: Any) -> None:
         super(TimeoutWithEqual, self).__init__(*arg, **kwargs)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return False
         return self._read == other._read and self._connect == other._connect and self.total == other.total
 
 class MockPoolManager(urllib3.PoolManager):
-    def __init__(self, tc):
+    def __init__(self, tc: unittest.TestCase) -> None:
         self._tc = tc
-        self._reqs = []
+        self._reqs: List[Any] = []
 
-    def expect_request(self, *args, **kwargs):
+    def expect_request(self, *args: Any, **kwargs: Any) -> None:
         self._reqs.append((args, kwargs))
 
-    def set_signing_config(self, signing_cfg):
+    def set_signing_config(self, signing_cfg: signing.HttpSigningConfiguration) -> None:
         self.signing_cfg = signing_cfg
         assert self.signing_cfg is not None
         self.pubkey = self.signing_cfg.get_public_key()
         assert self.pubkey is not None
 
-    def request(self, *actual_request_target, **actual_request_headers_and_body):
+    def request(self, *actual_request_target: Any, **actual_request_headers_and_body: Any) -> urllib3.HTTPResponse:
         self._tc.assertTrue(len(self._reqs) > 0)
         expected_results = self._reqs.pop(0)
         self._tc.maxDiff = None
@@ -121,7 +124,7 @@ class MockPoolManager(urllib3.PoolManager):
                 self._tc.assertEqual(expected, actual_request_headers_and_body[k])
         return urllib3.HTTPResponse(status=200, body=b'test')
 
-    def _validate_authorization_header(self, request_target, actual_headers, authorization_header):
+    def _validate_authorization_header(self, request_target, actual_headers, authorization_header) -> None: 
         """Validate the signature.
         """
         # Extract (created)
@@ -178,15 +181,20 @@ class MockPoolManager(urllib3.PoolManager):
             else:
                 self._tc.fail("Unsupported key: {0}".format(type(self.pubkey)))
 
+        assert self.pubkey is not None
         if signing_alg == signing.ALGORITHM_RSASSA_PKCS1v15:
+            assert isinstance(self.pubkey, RSA.RsaKey)
             pkcs1_15.new(self.pubkey).verify(digest, signature)
         elif signing_alg == signing.ALGORITHM_RSASSA_PSS:
+            assert isinstance(self.pubkey, RSA.RsaKey)
             pss.new(self.pubkey).verify(digest, signature)
         elif signing_alg == signing.ALGORITHM_ECDSA_MODE_FIPS_186_3:
+            assert isinstance(self.pubkey, ECC.EccKey)
             verifier = DSS.new(key=self.pubkey, mode=signing.ALGORITHM_ECDSA_MODE_FIPS_186_3,
                                 encoding='der')
             verifier.verify(digest, signature)
         elif signing_alg == signing.ALGORITHM_ECDSA_MODE_DETERMINISTIC_RFC6979:
+            assert isinstance(self.pubkey, ECC.EccKey)
             verifier = DSS.new(key=self.pubkey, mode=signing.ALGORITHM_ECDSA_MODE_DETERMINISTIC_RFC6979,
                                 encoding='der')
             verifier.verify(digest, signature)
@@ -217,7 +225,7 @@ class PetApiTests(unittest.TestCase):
             os.unlink(file_path)
 
     @classmethod
-    def setUpModels(cls):
+    def setUpModels(cls) -> None:
         category = petstore_api.Category(name="dog")
         category.id = id_gen()
         tag = petstore_api.Tag()
@@ -233,7 +241,7 @@ class PetApiTests(unittest.TestCase):
         cls.pet.tags = [tag]
 
     @classmethod
-    def setUpFiles(cls):
+    def setUpFiles(cls) -> None:
         cls.test_file_dir = os.path.join(
             os.path.dirname(__file__), "..", "testfiles")
         cls.test_file_dir = os.path.realpath(cls.test_file_dir)

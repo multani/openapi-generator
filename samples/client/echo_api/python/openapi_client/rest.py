@@ -17,6 +17,7 @@ import io
 import json
 import re
 import ssl
+from typing import Any, Dict, Optional
 
 import urllib3
 
@@ -26,7 +27,7 @@ SUPPORTED_SOCKS_PROXIES = {"socks5", "socks5h", "socks4", "socks4a"}
 RESTResponseType = urllib3.HTTPResponse
 
 
-def is_socks_proxy_url(url):
+def is_socks_proxy_url(url: str) -> bool:
     if url is None:
         return False
     split_section = url.split("://")
@@ -114,11 +115,11 @@ class RESTClientObject:
 
     def request(
         self,
-        method,
-        url,
-        headers=None,
-        body=None,
-        post_params=None,
+        method: str,
+        url: str,
+        headers: Optional[Dict[str, str]]=None,
+        body: Optional[Any]=None,
+        post_params: Optional[Dict[str, str]]=None,
         _request_timeout=None
     ):
         """Perform requests.

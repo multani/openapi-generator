@@ -22,7 +22,8 @@ from email.utils import formatdate
 import os
 import re
 from time import time
-from typing import List, Optional, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing_extensions import Protocol
 from urllib.parse import urlencode, urlparse
 
 # The constants below define a subset of HTTP headers that can be included in the
@@ -67,6 +68,10 @@ ALGORITHM_ECDSA_KEY_SIGNING_ALGORITHMS = {
 # The cryptographic hash algorithm for the message signature.
 HASH_SHA256 = 'sha256'
 HASH_SHA512 = 'sha512'
+
+
+class ToJSONProtocol(Protocol):
+    def to_json(self) -> str: ...
 
 
 class HttpSigningConfiguration:
@@ -215,7 +220,7 @@ class HttpSigningConfiguration:
 
         return request_headers_dict
 
-    def get_public_key(self):
+    def get_public_key(self) -> Optional[Union[ECC.EccKey, RSA.RsaKey]]:
         """Returns the public key object associated with the private key.
         """
         pubkey: Optional[Union[ECC.EccKey, RSA.RsaKey]] = None
@@ -225,7 +230,7 @@ class HttpSigningConfiguration:
             pubkey = self.private_key.public_key()
         return pubkey
 
-    def _load_private_key(self):
+    def _load_private_key(self) -> None:
         """Load the private key used to sign HTTP requests.
             The private key is used to sign HTTP requests as defined in
             https://datatracker.ietf.org/doc/draft-cavage-http-signatures/.
@@ -272,7 +277,17 @@ class HttpSigningConfiguration:
                         "Signing algorithm {0} is not compatible with private key".format(
                             self.signing_algorithm))
 
-    def _get_signed_header_info(self, resource_path, method, headers, body, query_params):
+    def _get_signed_header_info(
+        self,
+        resource_path: str,
+        method: str,
+        headers: Dict[str, str],
+        body: Optional[ToJSONProtocol],
+        query_params: Sequence[Tuple[Any, Any]],
+    ) -> Tuple[
+        List[Tuple[str, str]], # signature headers
+        Dict[str, str], # request headers
+    ]:
         """Build the HTTP headers (name, value) that need to be included in
         the HTTP signature scheme.
 
@@ -289,11 +304,14 @@ class HttpSigningConfiguration:
         """
 
         if body is None:
-            body = ''
+            _body = ""
         else:
-            body = body.to_json()
+            _body = body.to_json()
+
+        assert body is not None # help typing
 
         # Build the '(request-target)' HTTP signature parameter.
+        assert self.host is not None
         target_host = urlparse(self.host).netloc
         target_path = urlparse(self.host).path
         request_target = method.lower() + " " + target_path + resource_path
@@ -313,6 +331,8 @@ class HttpSigningConfiguration:
 
         signed_headers_list = []
         request_headers_dict = {}
+
+        value: Optional[str]
         for hdr_key in self.signed_headers:
             hdr_key = hdr_key.lower()
             if hdr_key == HEADER_REQUEST_TARGET:
@@ -325,7 +345,7 @@ class HttpSigningConfiguration:
                 value = cdate
                 request_headers_dict[HEADER_DATE] = '{0}'.format(cdate)
             elif hdr_key == HEADER_DIGEST.lower():
-                request_body = body.encode()
+                request_body = _body.encode()
                 body_digest, digest_prefix = self._get_message_digest(request_body)
                 b64_body_digest = b64encode(body_digest.digest())
                 value = digest_prefix + b64_body_digest.decode('ascii')
@@ -343,11 +363,13 @@ class HttpSigningConfiguration:
                     raise Exception(
                         "Cannot sign HTTP request. "
                         "Request does not contain the '{0}' header".format(hdr_key))
+
+            assert value is not None
             signed_headers_list.append((hdr_key, value))
 
         return signed_headers_list, request_headers_dict
 
-    def _get_message_digest(self, data):
+    def _get_message_digest(self, data: bytes) -> Tuple[Union[SHA256Hash, SHA512Hash], str]:
         """Calculates and returns a cryptographic digest of a specified HTTP request.
 
         :param data: The string representation of the date to be hashed with a cryptographic hash.
@@ -371,7 +393,7 @@ class HttpSigningConfiguration:
         digest.update(data)
         return digest, prefix
 
-    def _sign_digest(self, digest):
+    def _sign_digest(self, digest: Union[SHA256Hash, SHA512Hash]) -> bytes:
         """Signs a message digest with a private key specified in the signing_info.
 
         :param digest: A hashing object that contains the cryptographic digest of the HTTP request.
@@ -401,7 +423,11 @@ class HttpSigningConfiguration:
             raise Exception("Unsupported private key: {0}".format(type(self.private_key)))
         return b64encode(signature)
 
-    def _get_authorization_header(self, signed_headers, signed_msg):
+    def _get_authorization_header(
+        self,
+        signed_headers: List[Tuple[str, str]],
+        signed_msg: bytes,
+    ) -> str:
         """Calculates and returns the value of the 'Authorization' header when signing HTTP requests.
 
         :param signed_headers : A list of tuples. Each value is the name of a HTTP header that

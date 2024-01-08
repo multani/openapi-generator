@@ -18,7 +18,8 @@ import logging
 from logging import FileHandler
 import multiprocessing
 import sys
-from typing import Optional
+from typing import cast, Any, Dict, List, Optional
+from typing_extensions import Self
 import urllib3
 
 import http.client as httplib
@@ -75,7 +76,7 @@ conf = openapi_client.Configuration(
 
     """
 
-    _default = None
+    _default: Optional[Self] = None
 
     def __init__(self, host=None,
                  api_key=None, api_key_prefix=None,
@@ -220,7 +221,7 @@ conf = openapi_client.Configuration(
         object.__setattr__(self, name, value)
 
     @classmethod
-    def set_default(cls, default):
+    def set_default(cls, default: Optional[Self]) -> None:
         """Set default instance of configuration.
 
         It stores default configuration, which can be
@@ -231,7 +232,7 @@ conf = openapi_client.Configuration(
         cls._default = default
 
     @classmethod
-    def get_default_copy(cls):
+    def get_default_copy(cls) -> Self:
         """Deprecated. Please use `get_default` instead.
 
         Deprecated. Please use `get_default` instead.
@@ -241,7 +242,7 @@ conf = openapi_client.Configuration(
         return cls.get_default()
 
     @classmethod
-    def get_default(cls):
+    def get_default(cls) -> Self:
         """Return the default configuration.
 
         This method returns newly created, based on default constructor,
@@ -251,8 +252,12 @@ conf = openapi_client.Configuration(
         :return: The configuration object.
         """
         if cls._default is None:
-            cls._default = Configuration()
-        return cls._default
+            default = cls()
+            cls._default = default
+        else:
+            default = cast(Self, cls._default)
+
+        return default
 
     @property
     def logger_file(self):
@@ -339,7 +344,7 @@ conf = openapi_client.Configuration(
         self.__logger_format = value
         self.logger_formatter = logging.Formatter(self.__logger_format)
 
-    def get_api_key_with_prefix(self, identifier, alias=None):
+    def get_api_key_with_prefix(self, identifier: str, alias: Optional[str]=None) -> Optional[str]:
         """Gets API key (with prefix if set).
 
         :param identifier: The identifier of apiKey.
@@ -356,7 +361,9 @@ conf = openapi_client.Configuration(
             else:
                 return key
 
-    def get_basic_auth_token(self):
+        return None
+
+    def get_basic_auth_token(self) -> Optional[str]:
         """Gets HTTP basic authentication header (string).
 
         :return: The token for basic HTTP authentication.
@@ -405,7 +412,7 @@ conf = openapi_client.Configuration(
                "SDK Package Version: 1.0.0".\
                format(env=sys.platform, pyversion=sys.version)
 
-    def get_host_settings(self):
+    def get_host_settings(self) -> List[Dict[str, Any]]:
         """Gets an array of host settings
 
         :return: An array of host settings
@@ -417,7 +424,12 @@ conf = openapi_client.Configuration(
             }
         ]
 
-    def get_host_from_settings(self, index, variables=None, servers=None):
+    def get_host_from_settings(
+        self,
+        index: int,
+        variables: Optional[Dict[str, str]]=None,
+        servers: Optional[List[Dict[str, str]]]=None,
+    ) -> str:
         """Gets host URL based on the index and variables
         :param index: array index of the host settings
         :param variables: hash of variable and the corresponding value
@@ -440,7 +452,9 @@ conf = openapi_client.Configuration(
         url = server['url']
 
         # go through variables and replace placeholders
-        for variable_name, variable in server.get('variables', {}).items():
+        server_variables: Dict[str, Dict[str, str]] = server.get('variables', {})  # type: ignore
+        assert isinstance(server_variables, dict)
+        for variable_name, variable in server_variables.items():
             used_value = variables.get(
                 variable_name, variable['default_value'])
 

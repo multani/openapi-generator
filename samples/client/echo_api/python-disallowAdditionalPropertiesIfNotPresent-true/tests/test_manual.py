@@ -16,6 +16,7 @@ import unittest
 import datetime
 import base64
 import os
+from typing import Optional
 
 import openapi_client
 from openapi_client.api.query_api import QueryApi # noqa: E501
@@ -26,7 +27,7 @@ class TestManual(unittest.TestCase):
 
     gif_base64 = "R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
 
-    def setUpFiles(self):
+    def setUpFiles(self) -> None:
         self.test_file_dir = os.path.join(os.path.dirname(__file__), "..", "testfiles")
         self.test_file_dir = os.path.realpath(self.test_file_dir)
         self.test_gif = os.path.join(self.test_file_dir, "test.gif")
@@ -194,8 +195,8 @@ User-Agent: OpenAPI-Generator/1.0.0/python
         self.assertEqual(e.headers["Accept"], 'text/plain')
         self.assertEqual(e.method, 'POST')
 
-class EchoServerResponseParser():
-    def __init__(self, http_response):
+class EchoServerResponseParser:
+    def __init__(self, http_response: Optional[str]) -> None:
         if http_response is None:
             raise ValueError("http response must not be None.")
 

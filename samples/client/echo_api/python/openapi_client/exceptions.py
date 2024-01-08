@@ -12,7 +12,7 @@
     Do not edit the class manually.
 """  # noqa: E501
 
-from typing import Any, Optional
+from typing import Any, List, Optional, Union
 from typing_extensions import Self
 
 class OpenApiException(Exception):
@@ -189,7 +189,7 @@ class ServiceException(ApiException):
     pass
 
 
-def render_path(path_to_item):
+def render_path(path_to_item: List[Union[str, int]]) -> str:
     """Returns a string representation of a path"""
     result = ""
     for pth in path_to_item:

@@ -12,6 +12,8 @@ $ pytest
 """
 
 import os
+from typing import Any, List
+from typing_extensions import Self
 import unittest
 
 import petstore_api
@@ -28,22 +30,22 @@ HOST = 'http://localhost/v2'
 
 
 class TimeoutWithEqual(urllib3.Timeout):
-    def __init__(self, *arg, **kwargs):
+    def __init__(self, *arg: Any, **kwargs: Any) -> None:
         super(TimeoutWithEqual, self).__init__(*arg, **kwargs)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Self) -> bool: # type: ignore
         return self._read == other._read and self._connect == other._connect and self.total == other.total
 
 
 class MockPoolManager(urllib3.PoolManager):
-    def __init__(self, tc):
+    def __init__(self, tc: unittest.TestCase) -> None:
         self._tc = tc
-        self._reqs = []
+        self._reqs: List[Any] = []
 
-    def expect_request(self, *args, **kwargs):
+    def expect_request(self, *args: Any, **kwargs: Any) -> None:
         self._reqs.append((args, kwargs))
 
-    def request(self, *args, **kwargs):
+    def request(self, *args: Any, **kwargs: Any) -> urllib3.HTTPResponse:
         self._tc.assertTrue(len(self._reqs) > 0)
         r = self._reqs.pop(0)
         self._tc.maxDiff = None
@@ -63,7 +65,7 @@ class PetApiTests(unittest.TestCase):
         self.setUpModels()
         self.setUpFiles()
 
-    def setUpModels(self):
+    def setUpModels(self) -> None:
         self.category = petstore_api.Category(name="dog")
         self.category.id = id_gen()
         # self.category.name = "dog"
@@ -82,7 +84,7 @@ class PetApiTests(unittest.TestCase):
         self.pet2.category = self.category
         self.pet2.tags = [self.tag]
 
-    def setUpFiles(self):
+    def setUpFiles(self) -> None:
         self.test_file_dir = os.path.join(os.path.dirname(__file__), "..", "testfiles")
         self.test_file_dir = os.path.realpath(self.test_file_dir)
         self.foo = os.path.join(self.test_file_dir, "pix.gif")

@@ -16,7 +16,8 @@ import io
 import json
 import re
 import ssl
-from typing import Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
+from typing_extensions import TypedDict, NotRequired
 
 import aiohttp
 import aiohttp_retry
@@ -24,6 +25,18 @@ import aiohttp_retry
 from petstore_api.exceptions import ApiException, ApiValueError
 
 RESTResponseType = aiohttp.ClientResponse
+
+class RequestArgs(TypedDict):
+    """Arguments for an HTTP request"""
+
+    method: str
+    url: str
+    timeout: int
+    headers: Dict[str, str]
+    proxy: NotRequired[str]
+    proxy_headers: NotRequired[str]
+    data: NotRequired[Union[None, str, aiohttp.FormData]]
+
 
 ALLOW_RETRY_METHODS = frozenset({'DELETE', 'GET', 'HEAD', 'OPTIONS', 'PUT', 'TRACE'})
 
@@ -97,19 +110,26 @@ class RESTClientObject:
         else:
             self.retry_client = None
 
-    async def close(self):
+    async def close(self) -> None:
         await self.pool_manager.close()
         if self.retry_client is not None:
             await self.retry_client.close()
 
     async def request(
         self,
-        method,
-        url,
-        headers=None,
-        body=None,
-        post_params=None,
-        _request_timeout=None
+        method: str,
+        url: str,
+        headers: Optional[Dict[str, str]]=None,
+        body: Optional[str]=None,
+        post_params: Optional[
+            List[
+                Union[
+                    Tuple[str, str],
+                    Tuple[str, Tuple[str, str, str]],
+                ],
+            ]
+        ]=None,
+        _request_timeout: Optional[int]=None
     ):
         """Execute request
 
@@ -141,7 +161,7 @@ class RESTClientObject:
                 "body parameter cannot be used with post_params parameter."
             )
 
-        post_params = post_params or {}
+        post_params = post_params or []
         headers = headers or {}
         # url already contains the URL query string
         timeout = _request_timeout or 5 * 60
@@ -149,12 +169,12 @@ class RESTClientObject:
         if 'Content-Type' not in headers:
             headers['Content-Type'] = 'application/json'
 
-        args = {
+        args = RequestArgs({
             "method": method,
             "url": url,
             "timeout": timeout,
             "headers": headers
-        }
+        })
 
         if self.proxy:
             args["proxy"] = self.proxy

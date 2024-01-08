@@ -13,6 +13,8 @@ import os
 import sys
 import unittest
 
+import pytest
+
 import petstore_api
 from petstore_api.rest import ApiException
 
@@ -26,7 +28,7 @@ class ApiExceptionTests(unittest.TestCase):
         self.pet_api = petstore_api.PetApi(self.api_client)
         self.setUpModels()
 
-    def setUpModels(self):
+    def setUpModels(self) -> None:
         self.category = petstore_api.Category(name="dog")
         self.category.id = id_gen()
         self.category.name = "dog"
@@ -44,40 +46,26 @@ class ApiExceptionTests(unittest.TestCase):
         assert self.pet.id is not None
         self.pet_api.delete_pet(pet_id=self.pet.id)
 
-        with self.checkRaiseRegex(ApiException, "Pet not found"):
+        with pytest.raises(ApiException, match="Pet not found") as exc:
             self.pet_api.get_pet_by_id(pet_id=self.pet.id)
 
-        try:
-            self.pet_api.get_pet_by_id(pet_id=self.pet.id)
-        except ApiException as e:
-            self.assertEqual(e.status, 404)
-            self.assertEqual(e.reason, "Not Found")
-            self.checkRegex(e.body, "Pet not found")
+        assert exc.value.status == 404
+        assert exc.value.reason == "Not Found"
+        assert exc.value.body is not None
+        assert "Pet not found" in exc.value.body
 
     def test_500_error(self):
         self.pet_api.add_pet(self.pet)
         assert self.pet.id is not None
 
-        with self.checkRaiseRegex(ApiException, "Internal Server Error"):
+        with pytest.raises(ApiException, match="Internal Server Error") as exc:
             self.pet_api.upload_file(
                 pet_id=self.pet.id,
                 additional_metadata="special",
                 file=None
             )
 
-        try:
-            self.pet_api.upload_file(
-                pet_id=self.pet.id,
-                additional_metadata="special",
-                file=None
-            )
-        except ApiException as e:
-            self.assertEqual(e.status, 500)
-            self.assertEqual(e.reason, "Internal Server Error")
-            self.checkRegex(e.body, "Error 500 Internal Server Error")
-
-    def checkRaiseRegex(self, expected_exception, expected_regex):
-        return self.assertRaisesRegex(expected_exception, expected_regex)
-
-    def checkRegex(self, text, expected_regex):
-        return self.assertRegex(text, expected_regex)
+        assert exc.value.status == 500
+        assert exc.value.reason == "Internal Server Error"
+        assert exc.value.body is not None
+        assert "Error 500 Internal Server Error" in exc.value.body

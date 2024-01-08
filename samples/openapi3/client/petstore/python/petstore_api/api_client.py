@@ -12,6 +12,8 @@
 """  # noqa: E501
 
 
+from __future__ import annotations
+
 import datetime
 from dateutil.parser import parse
 import json
@@ -21,7 +23,8 @@ import re
 import tempfile
 
 from urllib.parse import quote
-from typing import Tuple, Optional, List, Dict
+from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
+from typing_extensions import Protocol, Self
 
 from petstore_api.configuration import Configuration
 from petstore_api.api_response import ApiResponse, T as ApiResponseT
@@ -38,6 +41,22 @@ from petstore_api.exceptions import (
 )
 
 RequestSerialized = Tuple[str, str, Dict[str, str], Optional[str], List[str]]
+
+DeserializeT = TypeVar("DeserializeT")
+"""The type of tje function that deserialize an object as itself"""
+
+class DeserializeModelT(Protocol):
+    """Represent the model classes that can be deserialized"""
+
+    @classmethod
+    def from_dict(
+        cls,
+        obj: Union[
+            Dict[str, Any],
+            Optional[Dict[str, Any]],
+        ],
+    ) -> Optional[Self]: ...
+
 
 class ApiClient:
     """Generic API client for OpenAPI client library builds.
@@ -108,10 +127,10 @@ class ApiClient:
         self.default_headers[header_name] = header_value
 
 
-    _default = None
+    _default: Optional[Self] = None
 
     @classmethod
-    def get_default(cls):
+    def get_default(cls) -> ApiClient:
         """Return new instance of ApiClient.
 
         This method returns newly created, based on default constructor,
@@ -121,7 +140,7 @@ class ApiClient:
         :return: The ApiClient object.
         """
         if cls._default is None:
-            cls._default = ApiClient()
+            cls._default = cls()
         return cls._default
 
     @classmethod
@@ -143,7 +162,8 @@ class ApiClient:
         header_params=None,
         body=None,
         post_params=None,
-        files=None, auth_settings=None,
+        files=None,
+        auth_settings=None,
         collection_formats=None,
         _host=None,
         _request_auth=None
@@ -327,7 +347,7 @@ class ApiClient:
             raw_data = response_data.data
         )
 
-    def sanitize_for_serialization(self, obj):
+    def sanitize_for_serialization(self, obj: object):
         """Builds a JSON POST object.
 
         If obj is None, return None.
@@ -364,6 +384,7 @@ class ApiClient:
             # and attributes which value is not None.
             # Convert attribute name to json key in
             # model definition for request.
+            assert hasattr(obj, "to_dict")
             obj_dict = obj.to_dict()
 
         return {
@@ -371,10 +392,10 @@ class ApiClient:
             for key, val in obj_dict.items()
         }
 
-    def deserialize(self, response_text, response_type):
+    def deserialize(self, response_text: str, response_type: Union[type, str]) -> object:
         """Deserializes response into an object.
 
-        :param response: RESTResponse object to be deserialized.
+        :param response_text: RESTResponse object to be deserialized.
         :param response_type: class literal for
             deserialized object, or string of class name.
 
@@ -389,7 +410,14 @@ class ApiClient:
 
         return self.__deserialize(data, response_type)
 
-    def __deserialize(self, data, klass):
+    def __deserialize(
+        self,
+        data: Optional[Any],
+        klass: Union[
+            type, # class literal
+            str,  # class name
+        ],
+    ) -> object:
         """Deserializes dict, list, str into an object.
 
         :param data: dict, list or str.
@@ -421,6 +449,9 @@ class ApiClient:
             else:
                 klass = getattr(petstore_api.models, klass)
 
+        # The class name (if any), has been materialized into a class literal
+        assert isinstance(klass, type)
+
         if klass in self.PRIMITIVE_TYPES:
             return self.__deserialize_primitive(data, klass)
         elif klass == object:
@@ -430,9 +461,13 @@ class ApiClient:
         elif klass == datetime.datetime:
             return self.__deserialize_datetime(data)
         else:
-            return self.__deserialize_model(data, klass)
+            return self.__deserialize_model(data, klass) # type: ignore
 
-    def parameters_to_tuples(self, params, collection_formats):
+    def parameters_to_tuples(
+        self,
+        params: Union[Dict[str, str], List[Tuple[str, str]]],
+        collection_formats: Dict[str, str],
+    ) -> List[Tuple[str, str]]:
         """Get parameters as list of tuples, formatting collections.
 
         :param params: Parameters as dict or list of two-tuples
@@ -462,7 +497,22 @@ class ApiClient:
                 new_params.append((k, v))
         return new_params
 
-    def parameters_to_url_query(self, params, collection_formats):
+    def parameters_to_url_query(
+        self,
+        params: Union[
+            Dict[str, Any],
+            List[
+                Tuple[
+                    str,
+                    Union[
+                        Dict[ str, Any],
+                        bool,
+                    ],
+                ],
+            ],
+        ],
+        collection_formats: Dict[str, str],
+    ) -> str:
         """Get parameters as list of tuples, formatting collections.
 
         :param params: Parameters as dict or list of two-tuples
@@ -501,7 +551,22 @@ class ApiClient:
 
         return "&".join(["=".join(item) for item in new_params])
 
-    def files_parameters(self, files=None):
+    def files_parameters(
+        self,
+        files: Optional[
+            Dict[
+                str,
+                Union[List[str], str],
+            ]
+        ]=None,
+    ) -> List[Tuple[
+        str,
+        Tuple[
+            str,   # filename
+            bytes, # data
+            str,   # mimetype
+        ],
+    ]]:
         """Builds form parameters.
 
         :param files: File parameters.
@@ -513,7 +578,7 @@ class ApiClient:
             for k, v in files.items():
                 if not v:
                     continue
-                file_names = v if type(v) is list else [v]
+                file_names = v if isinstance(v, list) else [v]
                 for n in file_names:
                     with open(n, 'rb') as f:
                         filename = os.path.basename(f.name)
@@ -522,9 +587,10 @@ class ApiClient:
                             mimetypes.guess_type(filename)[0]
                             or 'application/octet-stream'
                         )
-                        params.append(
-                            tuple([k, tuple([filename, filedata, mimetype])])
-                        )
+                        params.append((
+                            k,
+                            (filename, filedata, mimetype)
+                        ))
 
         return params
 
@@ -543,7 +609,7 @@ class ApiClient:
 
         return accepts[0]
 
-    def select_header_content_type(self, content_types):
+    def select_header_content_type(self, content_types: List[str]) -> Optional[str]:
         """Returns `Content-Type` based on an array of content_types provided.
 
         :param content_types: List of content-types.
@@ -674,7 +740,7 @@ class ApiClient:
 
         return path
 
-    def __deserialize_primitive(self, data, klass):
+    def __deserialize_primitive(self, data: str, klass: type) -> Union[int, float, str, bool]:
         """Deserializes string to primitive type.
 
         :param data: str.
@@ -689,14 +755,14 @@ class ApiClient:
         except TypeError:
             return data
 
-    def __deserialize_object(self, value):
+    def __deserialize_object(self, value: DeserializeT) -> DeserializeT:
         """Return an original value.
 
         :return: object.
         """
         return value
 
-    def __deserialize_date(self, string):
+    def __deserialize_date(self, string: str) -> Union[datetime.date, str]:
         """Deserializes string to date.
 
         :param string: str.
@@ -712,7 +778,7 @@ class ApiClient:
                 reason="Failed to parse `{0}` as date object".format(string)
             )
 
-    def __deserialize_datetime(self, string):
+    def __deserialize_datetime(self, string: str) -> Union[datetime.datetime, str]:
         """Deserializes string to datetime.
 
         The string should be in iso8601 datetime format.
@@ -733,7 +799,7 @@ class ApiClient:
                 )
             )
 
-    def __deserialize_model(self, data, klass):
+    def __deserialize_model(self, data, klass: DeserializeModelT) -> Optional[DeserializeModelT]:
         """Deserializes list or dict to model.
 
         :param data: dict, list.
