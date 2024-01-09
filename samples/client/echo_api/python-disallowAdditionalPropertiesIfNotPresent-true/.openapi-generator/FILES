@@ -47,6 +47,7 @@ openapi_client/models/test_query_style_deep_object_explode_true_object_all_of_qu
 openapi_client/models/test_query_style_form_explode_true_array_string_query_object_parameter.py
 openapi_client/py.typed
 openapi_client/rest.py
+openapi_client/rest_response.py
 pyproject.toml
 requirements.txt
 setup.cfg

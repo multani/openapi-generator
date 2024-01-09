@@ -1,0 +1,29 @@
+# coding: utf-8
+
+{{>partial_header}}
+
+import io
+from typing import Mapping, Optional
+
+from urllib3 import HTTPResponse as RESTResponseType
+
+
+class RESTResponse(io.IOBase):
+    def __init__(self, resp: RESTResponseType) -> None:
+        self.response = resp
+        self.status = resp.status
+        self.reason = resp.reason
+        self.data: Optional[bytes] = None
+
+    def read(self) -> bytes:
+        if self.data is None:
+            self.data = self.response.data
+        return self.data
+
+    def getheaders(self) -> Mapping[str, str]:
+        """Returns a dictionary of the response headers."""
+        return self.response.headers
+
+    def getheader(self, name: str, default: Optional[str]=None) -> Optional[str]:
+        """Returns a given response header."""
+        return self.response.headers.get(name, default)

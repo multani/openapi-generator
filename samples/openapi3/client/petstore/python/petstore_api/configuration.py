@@ -137,15 +137,21 @@ conf = petstore_api.Configuration(
 
     _default: Optional[Self] = None
 
-    def __init__(self, host=None,
-                 api_key=None, api_key_prefix=None,
-                 username=None, password=None,
-                 access_token=None,
-                 signing_info=None,
-                 server_index=None, server_variables=None,
-                 server_operation_index=None, server_operation_variables=None,
-                 ssl_ca_cert=None,
-                 ) -> None:
+    def __init__(
+        self,
+        host: Optional[str]=None,
+        api_key: Optional[Dict[str, str]]=None,
+        api_key_prefix: Optional[Dict[str, str]]=None,
+        username: Optional[str]=None,
+        password: Optional[str]=None,
+        access_token: Optional[str]=None,
+        signing_info: Optional[petstore_api.signing.HttpSigningConfiguration]=None,
+        server_index: Optional[int]=None,
+        server_variables: Optional[Dict[str, str]]=None,
+        server_operation_index: Optional[Dict[str, str]]=None,
+        server_operation_variables: Optional[Dict[str, str]]=None,
+        ssl_ca_cert: Optional[str]=None,
+    ) -> None:
         """Constructor
         """
         self._base_path = "http://petstore.swagger.io:80/v2" if host is None else host
@@ -163,7 +169,7 @@ conf = petstore_api.Configuration(
         """Temp file folder for downloading files
         """
         # Authentication Settings
-        self.api_key = {}
+        self.api_key: Dict[str, str] = {}
         if api_key:
             self.api_key = api_key
         """dict to store API key(s)
@@ -565,7 +571,7 @@ conf = petstore_api.Configuration(
 
     def get_host_from_settings(
         self,
-        index: int,
+        index: Optional[int],
         variables: Optional[Dict[str, str]]=None,
         servers: Optional[List[Dict[str, str]]]=None,
     ) -> str:

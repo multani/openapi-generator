@@ -12,7 +12,6 @@
 """  # noqa: E501
 
 
-import io
 import json
 import re
 import ssl
@@ -21,6 +20,7 @@ from typing import Any, Dict, Optional
 import urllib3
 
 from petstore_api.exceptions import ApiException, ApiValueError
+from petstore_api.rest_response import RESTResponse
 
 SUPPORTED_SOCKS_PROXIES = {"socks5", "socks5h", "socks4", "socks4a"}
 RESTResponseType = urllib3.HTTPResponse
@@ -34,28 +34,6 @@ def is_socks_proxy_url(url: str) -> bool:
         return False
     else:
         return split_section[0].lower() in SUPPORTED_SOCKS_PROXIES
-
-
-class RESTResponse(io.IOBase):
-
-    def __init__(self, resp) -> None:
-        self.response = resp
-        self.status = resp.status
-        self.reason = resp.reason
-        self.data = None
-
-    def read(self):
-        if self.data is None:
-            self.data = self.response.data
-        return self.data
-
-    def getheaders(self):
-        """Returns a dictionary of the response headers."""
-        return self.response.headers
-
-    def getheader(self, name, default=None):
-        """Returns a given response header."""
-        return self.response.headers.get(name, default)
 
 
 class RESTClientObject:
